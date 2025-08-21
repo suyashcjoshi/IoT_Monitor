@@ -52,7 +52,7 @@ ngrok http 5001
 1. Create MotherDuck database: `iot-metrics`
 2. Setup Airbyte Cloud source: HTTP API pointing to `https://your-ngrok-url.ngrok.io/api/airbyte/all`
 3. Setup Airbyte destination: MotherDuck
-4. Create connection with 5-minute sync
+4. Create connection with hourly sync
 
 ## Data Schema
 
@@ -84,23 +84,26 @@ ngrok http 5001
 ```sql
 -- Check data ingestion
 SELECT COUNT(*) FROM "_airbyte_raw_HTTP";
-
--- Temperature readings
-SELECT 
-    JSON_EXTRACT("*airbyte*data", '$.device_id') as device,
-    JSON_EXTRACT("*airbyte*data", '$.value') as temperature
-FROM "_airbyte_raw_HTTP"
-WHERE JSON_EXTRACT("*airbyte*data", '$.source_type') = 'sensor'
-LIMIT 10;
-
--- Cooling efficiency
-SELECT 
-    JSON_EXTRACT("*airbyte*data", '$.system_id') as system,
-    AVG(CAST(JSON_EXTRACT("*airbyte*data", '$.efficiency_percent') AS DOUBLE)) as avg_efficiency
-FROM "_airbyte_raw_HTTP"
-WHERE JSON_EXTRACT("*airbyte*data", '$.source_type') = 'cooling'
-GROUP BY JSON_EXTRACT("*airbyte*data", '$.system_id');
 ```
+
+```sql
+SELECT * FROM "_airbyte_raw_HTTP" LIMIT 3;
+```
+
+```sql
+_airbyte_emitted_at	record_id	source_type	device_id	sensor_value	sensor_timestamp
+2025-08-21 16:56:13.921146					"""2025-08-21T16:50:39.313663+00:00"""
+2025-08-21 16:56:13.921301					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.92139					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921471					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921535					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921583					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921627					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.92167					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921713					"""2025-08-21T16:51:09.315307+00:00"""
+2025-08-21 16:56:13.921766					"""2025-08-21T16:51:09.315307+00:00"""
+```
+
 
 ## Real-World Extensions
 
