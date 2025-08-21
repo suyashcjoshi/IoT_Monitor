@@ -1,0 +1,4 @@
+flask==2.3.3
+kafka-python==2.0.2
+psycopg2-binary==2.9.7
+requests==2.31.0
